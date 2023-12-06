@@ -2,7 +2,7 @@ package dev.rockyj.advent_kt
 
 private data class ScratchCard(val id: Int, val wins: List<Int>, val nums: List<Int>)
 
-private fun toCards(input: List<String>): MutableList<Pair<List<Int>, List<Int>>> {
+private fun toCards(input: List<String>): List<Pair<List<Int>, List<Int>>> {
     val cards = mutableListOf<Pair<List<Int>, List<Int>>>()
 
     input.forEachIndexed { _idx, line ->
@@ -15,7 +15,7 @@ private fun toCards(input: List<String>): MutableList<Pair<List<Int>, List<Int>>
         cards.add(Pair(winningNumbers, myNumbers))
     }
 
-    return cards
+    return cards.toList()
 }
 
 private fun foobar(cardPack: List<ScratchCard>, copies: MutableMap<Int, Int>, from: Int = 0) {
@@ -35,20 +35,19 @@ private fun foobar(cardPack: List<ScratchCard>, copies: MutableMap<Int, Int>, fr
     val winCount = myNums.filter { wins.contains(it) }.size
     val copyIds = (1..winCount).map { card.id + it }
 
-    val nextCards = copyIds.mapNotNull { cardPack.find { card -> card.id == it } }
-    nextCards.forEach { copy ->
-        repeat((1..currCardCopies).count()) {
-            copies[copy.id] = (copies[copy.id] ?: 1) + 1
+    copyIds
+        .mapNotNull { cardPack.find { card -> card.id == it } }
+        .forEach { copy ->
+            repeat((1..currCardCopies).count()) {
+                copies[copy.id] = (copies[copy.id] ?: 1) + 1
+            }
         }
-    }
 
     foobar(cardPack, copies, from + 1)
 }
 
 private fun part2(input: List<String>) {
-    val cards = toCards(input)
-
-    val cardPack = cards.mapIndexed { idx, cardLine ->
+    val cardPack = toCards(input).mapIndexed { idx, cardLine ->
         ScratchCard(idx + 1, cardLine.first, cardLine.second)
     }
 
