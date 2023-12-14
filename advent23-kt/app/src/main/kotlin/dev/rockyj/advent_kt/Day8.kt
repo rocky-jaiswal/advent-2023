@@ -34,12 +34,7 @@ private fun part2(input: List<String>) {
         val next = if (step == "L") {
             starts.map { mapX[it]!!.first }
         } else {
-            starts.map {
-                if (mapX[it] == null) {
-                    println(it)
-                }
-                mapX[it]!!.second
-            }
+            starts.map { mapX[it]!!.second }
         }
 
         if (next.all { it.endsWith("Z") }) {

@@ -1,13 +1,8 @@
 package dev.rockyj.advent_kt
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 
-suspend fun <T, R> Iterable<T>.mapParallel(transform: (T) -> R): List<R> = coroutineScope {
-    map { async { transform(it) } }.map { it.await() }
-}
 
 private fun findWaysToWin(timeAndDist: Pair<Long, Long>): Int {
     val time = timeAndDist.first
