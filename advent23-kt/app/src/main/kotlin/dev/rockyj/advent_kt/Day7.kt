@@ -10,7 +10,7 @@ private val cardRanking2 = "A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J".split(",")
     .filter { it != "" }
     .reversed()
 
-private data class Hand(val cards: List<String>, val bid: Long, val index: Int)
+private data class Hand(val cards: List<String>, val cloned: List<String>, val bid: Long, val index: Int)
 
 private fun comp(h1: Hand, h2: Hand): Int {
     val h1c = h1.cards.map { cardRanking2.indexOf(it) }
@@ -43,7 +43,15 @@ private fun part2(input: List<String>) {
         val cards = parts.first().split("").filter { it != "" }
         val bid = parts.last()
 
-        handsM.add(Hand(cards, bid.toLong(), idx))
+        val groupsWithoutJoker = cards.filter { it != "J" }.groupBy { it }
+        val cloned = if (groupsWithoutJoker.isNotEmpty()) {
+            val biggestGroupWithoutJoker = groupsWithoutJoker.keys.sortedBy { groupsWithoutJoker[it]!!.size }.last()
+            cards.map { if (it == "J" || it == biggestGroupWithoutJoker) "X" else it }
+        } else {
+            cards
+        }
+
+        handsM.add(Hand(cards, cloned, bid.toLong(), idx))
     }
 
     val hands = handsM.toList()
@@ -60,10 +68,7 @@ private fun part2(input: List<String>) {
     val fourOfAKind = hands.filter { !fiveOfAKind.map { ex -> ex.index }.contains(it.index) }.filter { hand ->
         val cards = hand.cards
         val groups = cards.groupBy { it }
-        val groupsWithoutJoker = cards.filter { it != "J" }.groupBy { it }
-        val biggestGroupWithoutJoker = groupsWithoutJoker.keys.sortedBy { groupsWithoutJoker[it]!!.size }.last()
-        val cloned = cards.map { if (it == "J" || it == biggestGroupWithoutJoker) "X" else it }
-        val clonedGroup = cloned.groupBy { it }
+        val clonedGroup = hand.cloned.groupBy { it }
 
         (cards.distinct().size == 2 && groups.keys.map { groups[it]!!.size }.sorted() == listOf(
             1,
@@ -76,10 +81,7 @@ private fun part2(input: List<String>) {
         hands.filter { !fiveOfAKind.plus(fourOfAKind).map { ex -> ex.index }.contains(it.index) }.filter { hand ->
             val cards = hand.cards
             val groups = cards.groupBy { it }
-            val groupsWithoutJoker = cards.filter { it != "J" }.groupBy { it }
-            val biggestGroupWithoutJoker = groupsWithoutJoker.keys.sortedBy { groupsWithoutJoker[it]!!.size }.last()
-            val cloned = cards.map { if (it == "J" || it == biggestGroupWithoutJoker) "X" else it }
-            val clonedGroup = cloned.groupBy { it }
+            val clonedGroup = hand.cloned.groupBy { it }
 
             (groups.size == 2 && groups.keys.map { groups[it]!!.size }.sorted() == listOf(
                 2,
@@ -93,10 +95,7 @@ private fun part2(input: List<String>) {
             .filter { hand ->
                 val cards = hand.cards
                 val groups = cards.groupBy { it }
-                val groupsWithoutJoker = cards.filter { it != "J" }.groupBy { it }
-                val biggestGroupWithoutJoker = groupsWithoutJoker.keys.sortedBy { groupsWithoutJoker[it]!!.size }.last()
-                val cloned = cards.map { if (it == "J" || it == biggestGroupWithoutJoker) "X" else it }
-                val clonedGroup = cloned.groupBy { it }
+                val clonedGroup = hand.cloned.groupBy { it }
 
                 (groups.keys.map { groups[it]!!.size }.sorted() == listOf(
                     1,
@@ -113,10 +112,7 @@ private fun part2(input: List<String>) {
             .filter { hand ->
                 val cards = hand.cards
                 val groups = cards.groupBy { it }
-                val groupsWithoutJoker = cards.filter { it != "J" }.groupBy { it }
-                val biggestGroupWithoutJoker = groupsWithoutJoker.keys.sortedBy { groupsWithoutJoker[it]!!.size }.last()
-                val cloned = cards.map { if (it == "J" || it == biggestGroupWithoutJoker) "X" else it }
-                val clonedGroup = cloned.groupBy { it }
+                val clonedGroup = hand.cloned.groupBy { it }
 
                 (cards.distinct().size == 3 && groups.keys.filter { k -> groups[k]!!.size == 2 }.size == 2)
                         || clonedGroup.keys.map { clonedGroup[it]!!.size }.sorted() == listOf(1, 2, 2)
@@ -131,10 +127,7 @@ private fun part2(input: List<String>) {
             .filter { hand ->
                 val cards = hand.cards
                 val groups = cards.groupBy { it }
-                val groupsWithoutJoker = cards.filter { it != "J" }.groupBy { it }
-                val biggestGroupWithoutJoker = groupsWithoutJoker.keys.sortedBy { groupsWithoutJoker[it]!!.size }.last()
-                val cloned = cards.map { if (it == "J" || it == biggestGroupWithoutJoker) "X" else it }
-                val clonedGroup = cloned.groupBy { it }
+                val clonedGroup = hand.cloned.groupBy { it }
 
                 (cards.distinct().size == 4 && groups.keys.filter { k -> groups[k]!!.size == 2 }.size == 1)
                         || clonedGroup.keys.map { clonedGroup[it]!!.size }.sorted() == listOf(1, 1, 1, 2)
@@ -175,7 +168,7 @@ private fun part1(input: List<String>) {
         val cards = parts.first().split("").filter { it != "" }
         val bid = parts.last()
 
-        handsM.add(Hand(cards, bid.toLong(), idx))
+        handsM.add(Hand(cards, cards, bid.toLong(), idx))
     }
 
     val hands = handsM.toList()
