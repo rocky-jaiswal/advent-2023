@@ -259,6 +259,6 @@ private fun part1(input: List<String>) {
 
 fun main() {
     val lines = fileToArr("day7_2.txt")
-    // part1(lines)
+    // part1(lines) TODO: change card ranking
     part2(lines)
 }
