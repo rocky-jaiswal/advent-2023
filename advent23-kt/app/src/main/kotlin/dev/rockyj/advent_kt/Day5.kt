@@ -1,5 +1,7 @@
 package dev.rockyj.advent_kt
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
 
 private val seedToSoilStr = """
@@ -310,16 +312,44 @@ private fun part1(input: List<String>) {
             Regex("\\s+")
         ).map { BigInteger(it) }
 
-    val locations = seeds.map { seed ->
-        val soil = findDest(seedToSoil, seed)
-        val fert = findDest(soilToFert, soil)
-        val water = findDest(fertToWater, fert)
-        val light = findDest(waterToLight, water)
-        val temp = findDest(lightToTemp, light)
-        val hum = findDest(tempToHum, temp)
-        val locn = findDest(humToLocation, hum)
+//    val seeds2 =
+//        ("1482445116 339187393 " +
+//                "3210489476 511905836 " +
+//                "42566461 51849137 " +
+//                "256584102 379575844 " +
+//                "3040181568 139966026 " +
+//                "4018529087 116808249 " +
+//                "2887351536 89515778 " +
+//                "669731009 806888490 " +
+//                "2369242654 489923931 " +
+//                "2086168596 82891253").split(
+//            Regex("\\s+")
+//        ).map { BigInteger(it) }
+//            .withIndex()
+//            .groupBy { it.index / 2 }
+//            .map { it.value.map { it.value } }
+//            .flatMap { it ->
+//                val lst = mutableListOf<BigInteger>()
+//                var count = it.first()
+//                while (count < it.first() + it.last()) {
+//                    lst.plusAssign(it.first() + count)
+//                    count += "1".toBigInteger()
+//                }
+//                lst
+//            }
 
-        locn
+    val locations = runBlocking(Dispatchers.Default) {
+        seeds.map { seed ->
+            val soil = findDest(seedToSoil, seed)
+            val fert = findDest(soilToFert, soil)
+            val water = findDest(fertToWater, fert)
+            val light = findDest(waterToLight, water)
+            val temp = findDest(lightToTemp, light)
+            val hum = findDest(tempToHum, temp)
+            val locn = findDest(humToLocation, hum)
+
+            locn
+        }
     }
 
     println(locations.min())
@@ -327,6 +357,8 @@ private fun part1(input: List<String>) {
 
 fun main() {
     val lines = fileToArr("day5_1.txt")
-    part1(lines)
+    timed {
+        part1(lines)
+    }
     // part2(lines)
 }
