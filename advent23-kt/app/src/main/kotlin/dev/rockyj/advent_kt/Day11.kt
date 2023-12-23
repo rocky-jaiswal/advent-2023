@@ -43,34 +43,6 @@ private fun part1(input: List<String>) {
     // println(expRows)
     // println(expCols)
 
-    // add expansions
-    var maxX = maxX(symbols)
-    var maxY = maxY(symbols)
-    expRows.forEachIndexed { idx, exp ->
-        (exp + 2 + idx..maxY + idx + 1).reversed().forEach {
-            (0..maxX).forEach { x ->
-                symbols[Pair(it, x)] = symbols[Pair(it - 1, x)]!!
-            }
-        }
-        (0..maxX).forEach { x ->
-            symbols[Pair(exp + 1 + idx, x)] = "."
-        }
-    }
-
-
-    maxX = maxX(symbols)
-    maxY = maxY(symbols)
-    expCols.forEachIndexed { idx, exp ->
-        (exp + 2 + idx..maxX + idx + 1).reversed().forEach {
-            (0..maxY).forEach { y ->
-                symbols[Pair(y, it)] = symbols[Pair(y, it - 1)]!!
-            }
-        }
-        (0..maxY).forEach { y ->
-            symbols[Pair(y, exp + 1 + idx)] = "."
-        }
-    }
-
     val galaxies = symbols.filter {
         it.value == "#"
     }
@@ -79,7 +51,7 @@ private fun part1(input: List<String>) {
 
     galaxies.forEach { gal1 ->
         galaxies.forEach { gal2 ->
-            if (gal1.key != gal2.key) {
+            if ((gal1.key != gal2.key)) { // && !pairs.contains(Pair(gal2.key, gal1.key))) {
                 pairs.plusAssign(Pair(gal1.key, gal2.key))
             }
         }
@@ -90,7 +62,43 @@ private fun part1(input: List<String>) {
     // println(pairs.size)
 
     val dist = pairs.map {
-        Math.abs(it.first.first - it.second.first) + Math.abs(it.first.second - it.second.second)
+        val pair1 = it.first
+        val pair2 = it.second
+
+        val left = if (pair1.second < pair2.second) {
+            pair1
+        } else {
+            pair2
+        }
+
+        val right = if (pair1.second > pair2.second) {
+            pair1
+        } else {
+            pair2
+        }
+
+        val up = if (pair1.first < pair2.first) {
+            pair1
+        } else {
+            pair2
+        }
+
+        val down = if (pair1.first > pair2.first) {
+            pair1
+        } else {
+            pair2
+        }
+
+        val exp1 = expCols.filter { cols -> cols > left.second && cols < right.second }.size
+        val exp2 = expRows.filter { rows -> rows > up.first && rows < down.first }.size
+
+        val mul = 1000000 - 1 // or 1
+
+        val res =
+            Math.abs(right.second - left.second).toLong() + Math.abs(down.first - up.first)
+                .toLong() + ((exp1 + exp2) * mul).toLong()
+
+        res
     }.sum()
 
     println(dist / 2)
